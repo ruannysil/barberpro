@@ -122,7 +122,7 @@ export default function Login() {
 
           <Center mt={2}>
             <Link href={'/register'}>
-              <Text color={'button.gray'} cursor={'pointer'}>Ainda não possui conta? <strong>Cadastre-se</strong></Text>
+              <Text color={'button.gray'} cursor={'pointer'} _hover={{color: "#fff"}}>Ainda não possui conta? <strong>Cadastre-se</strong></Text>
             </Link>
           </Center>
 

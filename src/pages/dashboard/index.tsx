@@ -79,7 +79,7 @@ export default function Dashboard({ schedule }: DashboardProps) {
                         </Heading>
                         <Link href={'/new'}>
                             <Button
-                                bg={'button.btn'}
+                                bg={'button.gray'}
                                 color={"#fff"}
                                 _hover={{ bg: 'button.cta' }}
                                 p={4}
