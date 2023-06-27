@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import LogoImg from '../../../public/image/logo.svg'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
-import { Center, Flex, Input, InputGroup, InputRightElement, Button, Text, } from '@chakra-ui/react'
+import { Center, Flex, Input, InputGroup, InputRightElement, Button, Text, useToast, Spinner } from '@chakra-ui/react'
 import { useState, useContext } from 'react'
 import Link from 'next/link'
 
@@ -18,16 +18,39 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false)
+    const toast = useToast();
 
     async function handleRegister() {
         if (name === '' && email === '' && password === '') {
+            toast({
+                title: "Erro!",
+                description: "Preencha todos os campos corretament.",
+                status: "error",
+                duration: 5000,
+                position: 'top-right',
+                isClosable: true
+            })
             return;
         }
+
+        setLoading(true)
 
         await signUp({
             name,
             email,
             password
+        })
+
+        setLoading(false);
+
+        toast({
+            title: "Sucesso!",
+            description: "Registrado com sucesso!",
+            status: "success",
+            duration: 5000,
+            position: 'top-right',
+            isClosable: true
         })
     }
 
@@ -96,8 +119,13 @@ export default function Register() {
                     </InputGroup>
 
 
-                    <Button background={'button.cta'} color={'gray.900'} mb={6} size={'lg'} _hover={{ bg: "#fac26e" }} onClick={handleRegister}>
-                        Acessar
+                    <Button background={'button.cta'} color={'gray.900'} mb={6} size={'lg'} _hover={{ bg: "#fac26e" }} onClick={handleRegister}
+                        disabled={loading}>
+                        {loading ? (
+                            <Spinner size={"md"} color="#fff"/>
+                        ): (
+                            "Criar conta"
+                        )}
                     </Button>
 
                     <Center mt={2}>

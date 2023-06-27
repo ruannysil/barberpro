@@ -9,6 +9,12 @@ import Link from 'next/link'
 import { AuthContext } from '@/src/content/AuthContext'
 import { canSSRGuest } from '@/src/utils/canSSRGuest'
 
+
+function isValidEmail(email: string) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email)
+}
+
 export default function Login() {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
@@ -20,9 +26,10 @@ export default function Login() {
 
   const { signIn } = useContext(AuthContext)
 
+
   async function handleLogin() {
 
-    if (email === '' || password === '') {
+    if (!isValidEmail(email) || password === '') {
       toast({
         title: "Erro!",
         description: "Email ou senha incorretos.",
@@ -112,7 +119,7 @@ export default function Login() {
             _hover={{ bg: "#fac26e" }}
             onClick={handleLogin}
             disabled={loading}
-            >
+          >
             {loading ? (
               <Spinner size={"md"} color='#fff' />
             ) : (
@@ -122,7 +129,7 @@ export default function Login() {
 
           <Center mt={2}>
             <Link href={'/register'}>
-              <Text color={'button.gray'} cursor={'pointer'} _hover={{color: "#fff"}}>Ainda não possui conta? <strong>Cadastre-se</strong></Text>
+              <Text color={'button.gray'} cursor={'pointer'} _hover={{ color: "#fff" }}>Ainda não possui conta? <strong>Cadastre-se</strong></Text>
             </Link>
           </Center>
 

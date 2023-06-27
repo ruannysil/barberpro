@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Flex, Text, Center, Button, Heading, useMediaQuery, styled } from '@chakra-ui/react';
+import { Flex, Text, Center, Button, Heading, useMediaQuery, Spinner } from '@chakra-ui/react';
 import Image from 'next/image';
 import LogoImg from '../../public/image/logo.svg';
 import img1 from '../../public/image/barbeiro.jpg';
@@ -15,12 +15,14 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SwiperCore, { Navigation, Pagination } from 'swiper';
+import { useState } from 'react';
 
 
 SwiperCore.use([Navigation, Pagination]);
 
 export default function Home() {
   const [isMobile] = useMediaQuery("(max-width: 500px)");
+  const [loading, setLoading] = useState(false)
 
   return (
     <>
@@ -44,9 +46,7 @@ export default function Home() {
                   <Swiper
                     slidesPerView={'auto'}
                     spaceBetween={10}
-                    // navigation
                     pagination={{ clickable: true }}
-                    // autoplay={{delay: 1}}
                     loop={true}
                     className="mySwiper"
 
@@ -83,8 +83,20 @@ export default function Home() {
           </Center>
 
           <Link href="/register">
-            <Button w="100%" background="button.cta" color="gray.900" mb={6} size="lg" _hover={{ bg: "#fac26e" }}>
-              Cadastre-se
+            <Button
+              w="100%"
+              background="button.cta"
+              color="gray.900"
+              mb={6} size="lg"
+              _hover={{ bg: "#fac26e" }}
+              disabled={loading}
+              onClick={() => setLoading(true)}
+            >
+              {loading ? (
+                <Spinner size={"md"} color={"#fff"} />
+              ) : (
+                "Cadastre-se"
+              )}
             </Button>
           </Link>
 

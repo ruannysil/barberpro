@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Flex, Text, Heading, Box, Input, Button } from "@chakra-ui/react";
+import { Flex, Text, Heading, Box, Input, Button, useToast, Spinner } from "@chakra-ui/react";
 import { Sidebar } from "@/src/components/sidebar";
 
 import Link from "next/link";
@@ -22,12 +22,39 @@ interface ProfileProps {
 
 export default function Profile({ user, premium }: ProfileProps) {
     const { logoutUser } = useContext(AuthContext)
-
+    const toast = useToast();
     const [name, setName] = useState(user && user.name);
     const [endereco, setEndereco] = useState(user && user?.endereco);
+    const [saving, setSaving] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
 
     async function handleLogout() {
-        await logoutUser();
+        setLoggingOut(true)
+
+        try {
+            await logoutUser();
+            toast({
+                title: "Sucesso!",
+                description: "Endereço salvo com sucesso!.",
+                status: "success",
+                duration: 5000,
+                position: 'top-right',
+                isClosable: true,
+            });
+
+            setLoggingOut(false)
+
+        } catch (error) {
+            toast({
+                title: "Erro!",
+                description: "Ocorreu um erro ao sair!.",
+                status: "error",
+                duration: 5000,
+                position: 'top-right',
+                isClosable: true,
+            });
+        }
+        setLoggingOut(false)
     }
 
     async function handleUpdateUser() {
@@ -36,6 +63,8 @@ export default function Profile({ user, premium }: ProfileProps) {
             return;
         }
 
+        setSaving(true)
+
         try {
             const apiClient = setupAPIClient();
             await apiClient.put('/users', {
@@ -43,10 +72,28 @@ export default function Profile({ user, premium }: ProfileProps) {
                 endereco: endereco,
             })
 
-            alert("Dados alterdos com sucesso!")
+
+            toast({
+                title: "Sucesso!",
+                description: "Endereço salvo com sucesso!.",
+                status: "success",
+                duration: 5000,
+                position: 'top-right',
+                isClosable: true,
+            });
+
+            setSaving(false)
 
         } catch (err) {
-            console.log(err)
+            toast({
+                title: "Erro!",
+                description: "Error ao salvar Endereço!.",
+                status: "error",
+                duration: 5000,
+                position: 'top-right',
+                isClosable: true,
+            });
+            setSaving(false)
         }
 
     }
@@ -121,7 +168,7 @@ export default function Profile({ user, premium }: ProfileProps) {
                                 <Text p={2} fontSize={'lg'} color={premium ? '#Fba931' : '#4dffb4'}>Plano {premium ? 'Premium' : 'Gratis'}</Text>
 
                                 <Link href='/planos'>
-                                    <Box cursor={'pointer'} p={1} pl={2} pr={2} bg={'#00cd52'} rounded={4} mr={2} >
+                                    <Box cursor={'pointer'} p={1} pl={2} pr={2} bg={'#00cd52'} _hover={{ bg: "#0b7033" }} rounded={4} mr={2} >
                                         Mudar plano
                                     </Box>
                                 </Link>
@@ -136,8 +183,13 @@ export default function Profile({ user, premium }: ProfileProps) {
                                 color={'button.default'}
                                 _hover={{ bg: '#ffb23eb3' }}
                                 onClick={handleUpdateUser}
+                                disabled={saving}
                             >
-                                Salvar
+                                {saving ? (
+                                    <Spinner size={"md"} color="#fff" />
+                                ) : (
+                                    "Salvar"
+                                )}
                             </Button>
 
                             <Button
@@ -145,12 +197,17 @@ export default function Profile({ user, premium }: ProfileProps) {
                                 mb={4}
                                 borderWidth={1}
                                 borderColor={'red.500'}
-                                bg={'transparent'}
+                                bg={'#ffffffff'}
                                 color={'red.500'}
                                 _hover={{ bg: '#db311bb3', color: '#fff' }}
                                 onClick={handleLogout}
+                                disabled={loggingOut}
                             >
-                                Sair da conta
+                                {loggingOut ? (
+                                    <Spinner size={"md"} color="#070404" />
+                                ) : (
+                                    "Sair da conta"
+                                )}
                             </Button>
 
                         </Flex>
