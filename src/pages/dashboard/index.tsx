@@ -65,6 +65,9 @@ export default function Dashboard({ schedule }: DashboardProps) {
 
     return (
         <>
+            <Head>
+                <title>Registrar cortes - Minha barbearia</title>
+            </Head>
             <Sidebar>
                 <Flex direction={"column"} align={"flex-start"} justify={"flex-start"}>
                     <Flex w={"100%"} direction={"row"} align={"center"} justifyContent={isMobile ? 'space-between' : 'flex-start'}>
