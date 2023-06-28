@@ -1,5 +1,5 @@
 import { Sidebar } from "@/src/components/sidebar";
-import { Button, Flex, Heading, Text, Stack, Switch, useMediaQuery } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text, Stack, Switch, useMediaQuery, useToast } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from 'next/link'
 import { IoMdPricetag } from 'react-icons/io'
@@ -21,23 +21,29 @@ interface HaircutsProps {
 }
 
 
-
-
-
-
 export default function Haircuts({ haircuts }: HaircutsProps) {
 
     const [isMobile] = useMediaQuery("(max-width: 500px)")
 
     const [haircutList, setHaircutList] = useState<HaicutsItem[]>(haircuts || [])
     const [disableHaircut, setDisableHaircut] = useState("enabled")
+    const [isDisabled, setIsDisabled] = useState(false);
+    const toast = useToast();
 
     async function handleDisable(e: ChangeEvent<HTMLInputElement>) {
+        setIsDisabled(!isDisabled)
         const apiClient = setupAPIClient();
-        
+
         if (e.target.value === "disabled") {
             setDisableHaircut("enabled");
-            // console.log("ativo")
+            toast({
+                title: "Sucesso!",
+                description: "Tabela de Cortes ativados!",
+                status: "success",
+                duration: 5000,
+                position: "bottom-right",
+                isClosable: true
+            })
             const response = await apiClient.get('/haircuts', {
                 params: {
                     status: true,
@@ -47,7 +53,14 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
             setHaircutList(response.data);
         } else {
             setDisableHaircut("disabled")
-            // console.log("desativado")
+            toast({
+                title: "Error!",
+                description: "Tabela de Cortes desativados!",
+                status: "error",
+                duration: 5000,
+                position: "bottom-right",
+                isClosable: true
+            })
 
             const response = await apiClient.get('/haircuts', {
                 params: {
@@ -90,7 +103,9 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
                         </Link>
 
                         <Stack ml={'auto'} align={'center'} direction={'row'}>
-                            <Text fontWeight={'bold'}>ATIVOS</Text>
+                            <Text fontWeight={'bold'}>
+                                {haircutList.length === 1 ? (isDisabled ? "Corte Desativado" : "Corte Ativado") : (isDisabled ? "Cortes Desativados" : "Cortes Ativados")}
+                            </Text>
                             <Switch colorScheme={'green'} size={'lg'} value={disableHaircut} onChange={(e) => handleDisable(e)} isChecked={disableHaircut === 'disabled' ? false : true} />
                         </Stack>
 

@@ -7,6 +7,8 @@ import {
     Heading,
     Input,
     Text,
+    Spinner,
+    useToast,
     useMediaQuery
 } from '@chakra-ui/react'
 import Link from "next/link";
@@ -27,13 +29,25 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
     const [name, setName] = useState('')
     const [price, setPrice] = useState('')
+    const [loading, setLoading] = useState(false);
     const router = useRouter()
+
+    const toast = useToast();
 
     async function handleRegister() {
         if (name === '' || price === '') {
+            toast({
+                title: "Erro!",
+                description: "Por favor preencha o nome do corte e o valor se colocar R$",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true,
+            })
             return;
         }
 
+        setLoading(true);
         try {
 
             const apiClient = setupAPIClient();
@@ -43,11 +57,27 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
             })
 
             router.push('/haircuts')
+            toast({
+                title: "Sucesso!",
+                description: "Corte de cabelo cadastrado com sucesso!",
+                status: "success",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
 
         } catch (err) {
             console.log('Erro ao cadastra esse modelo!', err)
+            toast({
+                title: "Erro!",
+                description: "Erro ao cadastra esse modelo!",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
         }
-
+        setLoading(false);
     }
 
     return (
@@ -141,8 +171,12 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
                             _hover={{ bg: "orange.500" }}
                             disabled={!subscription && count >= 3}
                             cursor={!subscription && count >= 3 ? "not-allowed" : "pointer"}
+                            isDisabled={loading}
                         >
-                            Cadastrar
+                            {loading ?
+                                (<Spinner size={"md"} color="#fff" />) :
+                                ("Cadastrar")
+                            }
                         </Button>
 
                         {!subscription && count >= 3 && (
@@ -164,28 +198,28 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
 export const getServerSideProps = canSSRAuth(async (ctx) => {
 
-    try{
-      const apiClient = setupAPIClient(ctx);
-  
-      const response = await apiClient.get('/haircut/check')
-      const count = await apiClient.get('/haircut/count')
-  
-      return {
-        props: {
-          subscription: response.data?.subscriptions?.status === 'active' ? true : false,
-          count: count.data
+    try {
+        const apiClient = setupAPIClient(ctx);
+
+        const response = await apiClient.get('/haircut/check')
+        const count = await apiClient.get('/haircut/count')
+
+        return {
+            props: {
+                subscription: response.data?.subscriptions?.status === 'active' ? true : false,
+                count: count.data
+            }
         }
-      }
-  
-    }catch(err){
-      console.log(err);
-  
-      return{
-        redirect:{
-          destination: '/dashboard',
-          permanent:false,
+
+    } catch (err) {
+        console.log(err);
+
+        return {
+            redirect: {
+                destination: '/dashboard',
+                permanent: false,
+            }
         }
-      }
     }
-  
-  })
+
+})

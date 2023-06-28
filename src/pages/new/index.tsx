@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Flex, Heading, useMediaQuery, Input, Select, Button, background } from '@chakra-ui/react';
+import { Flex, Heading, useMediaQuery, Input, Select, Button, Spinner, useToast } from '@chakra-ui/react';
 import { Sidebar } from "@/src/components/sidebar";
 import { useState, ChangeEvent } from 'react';
 
@@ -25,7 +25,9 @@ export default function New({ haircuts }: NewProps) {
 
     const [customer, setCustomer] = useState('');
     const [haircutSelected, setHaircutSelected] = useState(haircuts[0])
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
+    const toast = useToast();
 
     function handleSeleceted(id: string) {
         // console.log("nome do corte ", id)
@@ -39,9 +41,18 @@ export default function New({ haircuts }: NewProps) {
     async function handleRegister() {
 
         if (customer === '') {
-            alert('Preencha o nome do Cliente')
-            return;
+            toast({
+                title: "Erro!",
+                description: "Por favor, coloque o nome para seu cliente!",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
+            return ;
         }
+        setLoading(true)
+
 
         try {
             const apiClient = setupAPIClient();
@@ -52,9 +63,28 @@ export default function New({ haircuts }: NewProps) {
 
             router.push('/dashboard')
 
+            toast({
+                title: "Sucesso!",
+                description: "Cliente Registrado com sucesso!",
+                status: "success",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
+
         } catch (err) {
             console.log("erro ao registrar ", err)
+            toast({
+                title: "Erro!",
+                description: "erro ao registrar",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
         }
+
+        setLoading(false)
     }
 
     return (
@@ -126,8 +156,12 @@ export default function New({ haircuts }: NewProps) {
                             color={"gray.900"}
                             _hover={{ bg: "orange.500", color: "#fff" }}
                             onClick={handleRegister}
+                            disabled={loading}
                         >
-                            Cadastrar
+                            {loading ?
+                            (<Spinner size={"md"} color="#fff" />) :
+                            ( "Cadastrar" )
+                            }
                         </Button>
 
                     </Flex>

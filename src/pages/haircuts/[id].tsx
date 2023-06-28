@@ -1,4 +1,4 @@
-import { Text, Flex, Button, Heading, useMediaQuery, Input, Stack, Switch } from "@chakra-ui/react";
+import { Text, Flex, Button, Heading, useMediaQuery, Input, Stack, Switch, Spinner, useToast } from '@chakra-ui/react';
 import Head from "next/head";
 import { Sidebar } from "@/src/components/sidebar";
 
@@ -39,8 +39,11 @@ export default function EditHaircut({ haircut, subscription }: EditHaircutProps)
     const [name, setName] = useState(haircut?.name)
     const [price, setPrice] = useState(haircut?.price)
     const [status, setStatus] = useState(haircut?.status)
+    const [loading, setLoading] = useState(false)
+    const toast = useToast();
 
     const [disableHaircut, setDisableHaircut] = useState(haircut?.status ? 'disabled' : 'enabled')
+    console.log(disableHaircut)
 
     const router = useRouter()
 
@@ -49,14 +52,30 @@ export default function EditHaircut({ haircut, subscription }: EditHaircutProps)
 
     function handleChangeStatus(e: ChangeEvent<HTMLInputElement>) {
         if (e.target.value === 'disabled') {
-          setDisableHaircut('enabled');
-          setStatus(false);
+            setDisableHaircut('enabled');
+            setStatus(false);
+            toast({
+                title: "Error!",
+                description: "Corte desabilitado da tabela!",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
         } else {
-          setDisableHaircut('disabled');    
-          setStatus(true);
+            setDisableHaircut('disabled');
+            setStatus(true);
+            toast({
+                title: "Sucesso!",
+                description: "Corte habilitado a tabela!",
+                status: "success",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true
+            })
         }
-      }
-      
+    }
+
 
     async function handleUpdate() {
         console.log({
@@ -65,8 +84,18 @@ export default function EditHaircut({ haircut, subscription }: EditHaircutProps)
             status
         })
         if (name === '' || price === '') {
+            toast({
+                title: "Erro!",
+                description: "Por favor, preencha os campos de nome e valor",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true,
+            })
             return;
         }
+
+        setLoading(true);
 
         try {
             const apiClient = setupAPIClient();
@@ -77,13 +106,30 @@ export default function EditHaircut({ haircut, subscription }: EditHaircutProps)
                 haircut_id: haircut?.id
             })
 
-            // alert('Corte atualizado com sucesso!')
-
             router.push('/haircuts')
 
+            toast({
+                title: "Sucesso!",
+                description: "As alterações foram salvas com sucesso!",
+                status: "success",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true,
+            })
+
         } catch (err) {
-            console.log("Ocorreu um erro ao atualizar os dados",err)
+            console.log("Ocorreu um erro ao atualizar os dados", err)
+            toast({
+                title: "Erro!",
+                description: "Ocorreu um erro ao atualizar os dados!",
+                status: "error",
+                duration: 5000,
+                position: "top-right",
+                isClosable: true,
+            })
         }
+
+        setLoading(false)
     }
 
     return (
@@ -182,8 +228,12 @@ export default function EditHaircut({ haircut, subscription }: EditHaircutProps)
                                 disabled={subscription?.status !== 'active'}
                                 cursor={subscription?.status !== 'active' ? "not-allowed" : "pointer"}
                                 onClick={handleUpdate}
+                                isDisabled={loading}
                             >
-                                Salvar
+                                {loading ?
+                                    (<Spinner size={"md"} color='#fff' />) :
+                                    ("Salvar")
+                                }
                             </Button>
 
                             {subscription?.status !== 'active' && (
