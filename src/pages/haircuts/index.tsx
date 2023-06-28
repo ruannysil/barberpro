@@ -104,7 +104,7 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
 
                         <Stack ml={'auto'} align={'center'} direction={'row'}>
                             <Text fontWeight={'bold'}>
-                                {haircutList.length === 1 ? (isDisabled ? "Corte Desativado" : "Cortes Ativado") : (isDisabled ? "Corte Desativados" : "Cortes Ativados") }
+                                {haircutList.length === 1 ? (isDisabled ? "Corte Desativado" : "Corte Ativado") : (isDisabled ? "Cortes Desativados" : "Cortes Ativados") }
                             </Text>
                             <Switch colorScheme={'green'} size={'lg'} value={disableHaircut} onChange={(e) => handleDisable(e)} isChecked={disableHaircut === 'disabled' ? false : true} />
                         </Stack>
