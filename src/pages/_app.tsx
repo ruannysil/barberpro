@@ -1,6 +1,7 @@
 import { CSSReset, ChakraProvider, extendTheme } from '@chakra-ui/react'
 import { AuthProvider } from '../content/AuthContext'
-import { Swiper } from 'swiper/react';
+import ErrorHandler from './ErrorHandler';
+import { useRouter } from 'next/router';
 
 const colors = {
   barber: {
@@ -44,11 +45,15 @@ const theme = extendTheme({
 });
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
+  
   return (
     <ChakraProvider theme={theme}>
       <CSSReset />
       <AuthProvider>
-        <Component {...pageProps} />
+        <ErrorHandler>
+          <Component {...pageProps} />
+        </ErrorHandler>
       </AuthProvider>
     </ChakraProvider>
   );
